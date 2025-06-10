@@ -3,49 +3,37 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import SearchSuggestions from "./suggestions";
 import { useOutsideClick } from "@/hooks/use-outside-click";
-import useDebounce from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/use-debounce";
 import { City } from "@/lib/types";
+import { useSearch } from "@/hooks/use-search";
 
 interface Props {
   cities: City[];
-  setSelectedCity: Dispatch<SetStateAction<City | null>>;
+  setSelectedCity: Dispatch<SetStateAction<City | undefined>>;
 }
 
 export default function Search({ cities, setSelectedCity }: Props) {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [suggestions, setSuggestions] = useState<City[]>([]);
-  const { debouncedValue } = useDebounce(searchQuery, 500);
+  const {
+    debouncedValue,
+    searchQuery,
+    setSearchQuery,
+    suggestions,
+    setSuggestions,
+  } = useSearch(cities);
+
   const ref = useOutsideClick<HTMLFormElement>(() => {
     setSuggestions([]);
   });
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    //TODO
+    const city = cities.find(
+      (city) =>
+        city.name.toLocaleLowerCase() === debouncedValue.toLocaleLowerCase()
+    );
+    setSelectedCity(city);
+    setSuggestions([]);
   };
-
-  useEffect(() => {
-    function searchCities() {
-      if (debouncedValue.length >= 2) {
-        try {
-          const data = cities
-            .filter((city) =>
-              city.name
-                .toLocaleLowerCase()
-                .includes(debouncedValue.toLocaleLowerCase())
-            )
-            .slice(0, 6);
-          setSuggestions(data);
-        } catch (error) {
-          console.error("Error fetching autocomplete suggestions:", error);
-        }
-      } else {
-        setSuggestions([]);
-      }
-    }
-
-    searchCities();
-  }, [debouncedValue]);
 
   return (
     <form
@@ -64,6 +52,7 @@ export default function Search({ cities, setSelectedCity }: Props) {
         <SearchSuggestions
           setSelectedCity={setSelectedCity}
           suggestions={suggestions}
+          setSuggestions={setSuggestions}
           query={searchQuery}
         />
       )}

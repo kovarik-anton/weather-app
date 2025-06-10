@@ -13,3 +13,5 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+Set your api key in the .env file to the NEXT_PUBLIC_API_KEY variable.
