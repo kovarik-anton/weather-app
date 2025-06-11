@@ -1,5 +1,5 @@
 import { gunzipSync } from "zlib";
-import { CITIES_URL } from "./constants";
+import { CITIES_URL, FORECAST_URL } from "./constants";
 import { Coords } from "./types";
 
 export async function getCities() {
@@ -11,15 +11,13 @@ export async function getCities() {
 
   const buffer = await res.arrayBuffer();
   const unzipped = gunzipSync(Buffer.from(buffer));
-  const json = JSON.parse(unzipped.toString("utf-8"));
+  const cities = JSON.parse(unzipped.toString("utf-8"));
 
-  return json;
+  return cities;
 }
 
 export async function getForecast(coords: Coords) {
-  const response = await fetch(
-    `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&appid=${process.env.NEXT_PUBLIC_API_KEY}`
-  );
+  const response = await fetch(FORECAST_URL(coords.lat, coords.lon));
   if (!response.ok) {
     throw new Error("Failed to fetch data");
   }

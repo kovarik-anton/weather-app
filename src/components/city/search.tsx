@@ -1,28 +1,24 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import SearchSuggestions from "./suggestions";
 import { useOutsideClick } from "@/hooks/use-outside-click";
-import { useDebounce } from "@/hooks/use-debounce";
 import { City } from "@/lib/types";
 import { useSearch } from "@/hooks/use-search";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
+import { setCity, setSuggestions } from "@/lib/slices/citySlice";
 
 interface Props {
   cities: City[];
-  setSelectedCity: Dispatch<SetStateAction<City | undefined>>;
 }
 
-export default function Search({ cities, setSelectedCity }: Props) {
-  const {
-    debouncedValue,
-    searchQuery,
-    setSearchQuery,
-    suggestions,
-    setSuggestions,
-  } = useSearch(cities);
+export default function Search({ cities }: Props) {
+  const dispatch = useAppDispatch();
+  const suggestions = useAppSelector((state) => state.city.suggestions);
+
+  const { debouncedValue, searchQuery, setSearchQuery } = useSearch(cities);
 
   const ref = useOutsideClick<HTMLFormElement>(() => {
-    setSuggestions([]);
+    dispatch(setSuggestions([]));
   });
 
   const handleSubmit = (e: any) => {
@@ -31,8 +27,7 @@ export default function Search({ cities, setSelectedCity }: Props) {
       (city) =>
         city.name.toLocaleLowerCase() === debouncedValue.toLocaleLowerCase()
     );
-    setSelectedCity(city);
-    setSuggestions([]);
+    dispatch(setCity({ city, suggestions: [] }));
   };
 
   return (
@@ -48,14 +43,7 @@ export default function Search({ cities, setSelectedCity }: Props) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      {suggestions.length > 0 && (
-        <SearchSuggestions
-          setSelectedCity={setSelectedCity}
-          suggestions={suggestions}
-          setSuggestions={setSuggestions}
-          query={searchQuery}
-        />
-      )}
+      {suggestions.length > 0 && <SearchSuggestions query={searchQuery} />}
       <button
         type="submit"
         aria-label="Hledat"

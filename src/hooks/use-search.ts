@@ -1,12 +1,13 @@
-import { City, Weather } from "@/lib/types";
-import { getForecast } from "@/lib/utils";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { City } from "@/lib/types";
+import { useEffect, useState } from "react";
 import { useDebounce } from "./use-debounce";
+import { useAppDispatch } from "./redux-hooks";
+import { setSuggestions } from "@/lib/slices/citySlice";
 
 export function useSearch(cities: City[]) {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [suggestions, setSuggestions] = useState<City[]>([]);
 
+  const dispatch = useAppDispatch();
   const { debouncedValue } = useDebounce(searchQuery, 500);
 
   useEffect(() => {
@@ -20,12 +21,12 @@ export function useSearch(cities: City[]) {
                 .includes(debouncedValue.toLocaleLowerCase())
             )
             .slice(0, 6);
-          setSuggestions(data);
+          dispatch(setSuggestions(data));
         } catch (error) {
-          console.error("Error fetching autocomplete suggestions:", error);
+          console.error("Error autocomplete suggestions:", error);
         }
       } else {
-        setSuggestions([]);
+        dispatch(setSuggestions([]));
       }
     }
 
@@ -35,8 +36,6 @@ export function useSearch(cities: City[]) {
   return {
     searchQuery,
     setSearchQuery,
-    suggestions,
-    setSuggestions,
     debouncedValue,
   };
 }

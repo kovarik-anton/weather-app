@@ -1,4 +1,4 @@
-import WeatherContainer from "@/components/weather/weather-container";
+import App from "@/components/app";
 import { getCities } from "@/lib/utils";
 
 export default async function Page() {
@@ -6,7 +6,7 @@ export default async function Page() {
 
   return (
     <div className="min-h-screen p-4 relative w-full h-full">
-      <WeatherContainer cities={cities} />
+      <App cities={cities} />
     </div>
   );
 }

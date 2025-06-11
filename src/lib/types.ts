@@ -1,3 +1,5 @@
+import { store } from "./store";
+
 export interface City {
   name: string;
   coord: Coords;
@@ -13,3 +15,14 @@ export interface Weather {
   weather: string;
   time: Date;
 }
+
+export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;
+
+export type AppStore = typeof store;
+
+export type CityState = {
+  city: City | undefined;
+  suggestions: City[];
+};

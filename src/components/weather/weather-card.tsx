@@ -9,7 +9,7 @@ export default function WeatherCard({ weather }: Props) {
     <div className="border-2 border-slate-200 p-2 rounded-md m-1 h-full">
       <p>Datum: {weather.time.toLocaleDateString()}</p>
       <p>Čas: {weather.time.toLocaleTimeString()}</p>
-      <p>Teplota: {weather.temp}</p>
+      <p>Teplota: {Math.round(weather.temp)}</p>
       <p>Počasí: {weather.weather}</p>
     </div>
   );

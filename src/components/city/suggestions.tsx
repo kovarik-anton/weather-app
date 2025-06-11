@@ -1,21 +1,17 @@
 "use client";
 
+import { useAppDispatch, useAppSelector } from "@/hooks/redux-hooks";
+import { setCity } from "@/lib/slices/citySlice";
 import { City } from "@/lib/types";
-import { Dispatch, SetStateAction } from "react";
 
 interface Props {
-  suggestions: City[];
-  setSuggestions: Dispatch<SetStateAction<City[]>>;
-  setSelectedCity: Dispatch<SetStateAction<City | undefined>>;
   query: string;
 }
 
-export default function SearchSuggestions({
-  suggestions,
-  query,
-  setSelectedCity,
-  setSuggestions,
-}: Props) {
+export default function SearchSuggestions({ query }: Props) {
+  const dispatch = useAppDispatch();
+  const suggestions = useAppSelector((state) => state.city.suggestions);
+
   function highlightText(text: string, query: string) {
     if (!query) return text;
 
@@ -34,8 +30,7 @@ export default function SearchSuggestions({
   }
 
   function handleSelectCity(city: City) {
-    setSelectedCity(city);
-    setSuggestions([]);
+    dispatch(setCity({ city, suggestions: [] }));
   }
 
   return (
