@@ -10,6 +10,11 @@ export interface Coords {
   lat: number;
 }
 
+export interface WeatherForecast {
+  day: Date;
+  weather: Weather[];
+}
+
 export interface Weather {
   temp: number;
   weather: string;

@@ -1,6 +1,6 @@
 import { gunzipSync } from "zlib";
 import { CITIES_URL, FORECAST_URL } from "./constants";
-import { Coords } from "./types";
+import { Coords, WeatherForecast } from "./types";
 
 export async function getCities() {
   const res = await fetch(CITIES_URL);
@@ -23,13 +23,42 @@ export async function getForecast(coords: Coords) {
   }
 
   const data = await response.json();
-  const weatherForecast = data.list.map((item: any) => {
-    return {
+  const weatherForecast = groupForecastByDay(data);
+
+  return weatherForecast;
+}
+
+export function groupForecastByDay(data: any): WeatherForecast[] {
+  const dailyForecast: WeatherForecast[] = [];
+
+  data.list.forEach((item: any) => {
+    const day = new Date(item.dt_txt.split(" ")[0]);
+
+    let forecastDay = dailyForecast.find(
+      (f) => f.day.toString() === day.toString()
+    );
+
+    if (!forecastDay) {
+      forecastDay = {
+        day: day,
+        weather: [],
+      };
+      dailyForecast.push(forecastDay);
+    }
+
+    forecastDay.weather.push({
       temp: item.main.temp,
       weather: item.weather[0].main,
       time: new Date(item.dt_txt),
-    };
+    });
   });
 
-  return weatherForecast;
+  return dailyForecast;
+}
+
+export function formatTime(time: Date) {
+  return time.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
